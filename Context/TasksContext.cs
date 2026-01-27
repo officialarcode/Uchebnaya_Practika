@@ -4,7 +4,7 @@ using System;
 
 namespace API_UP2.Context
 {
-    public class TasksContext
+    public class TasksContext : DbContext
     {
         public DbSet<Tasks> Tasks { get; set; }
         public TasksContext()
