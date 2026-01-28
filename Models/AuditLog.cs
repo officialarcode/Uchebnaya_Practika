@@ -1,4 +1,6 @@
-﻿namespace API_UP2.Models
+﻿using Newtonsoft.Json.Linq;
+
+namespace API_UP2.Models
 {
     public class AuditLog
     {
@@ -6,7 +8,9 @@
         public string TableName { get; set; }
         public int RecordId { get; set; }
         public string Action { get; set; }
-        public DateTime Date_Birth { get; set; }
-        public int Gender { get; set; }
+        public JObject OldData { get; set; }
+        public JObject NewData { get; set; }
+        public int ChangedBy { get; set; }
+        public DateTime ChangedAt { get; set; }
     }
 }

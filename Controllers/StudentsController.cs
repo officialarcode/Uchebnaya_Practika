@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 namespace API_UP2.Controllers
 {
     [ApiController]

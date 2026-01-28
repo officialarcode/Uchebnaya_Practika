@@ -4,7 +4,7 @@
     public string Name { get; set; }
     public string LastName { get; set; }
     public string FirstName { get; set; }
-    public DateTime Date_Birth { get; set; }
+    public DateTime DateBirth { get; set; }
     public int Gender { get; set; } 
     public string Phone { get; set; }
     public string Education { get; set; }
