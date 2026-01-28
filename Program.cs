@@ -9,7 +9,7 @@ builder.Services.AddDbContext<StudentManagementContext>(options =>
             options.UseMySql("server=127.0.0.1;" +
             "uid=root;" +
             "pwd=;" +
-            "database=UP_02",
+            "database=StudentManagment",
             new MySqlServerVersion(new Version(8, 0, 11))));
 
 builder.Services.AddControllers();
