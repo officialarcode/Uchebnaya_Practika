@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using API_UP2.Data;
-using API_UP2.Models;
 using API_UP2.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using API_UP2.Context;
 
 namespace API_UP2.Services
 {

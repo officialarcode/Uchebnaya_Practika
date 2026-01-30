@@ -1,16 +1,18 @@
 using API_UP2.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 builder.Services.AddDbContext<StudentManagementContext>(options =>
-            options.UseMySql("server=127.0.0.1;" +
-            "uid=root;" +
-            "pwd=;" +
-            "database=StudentManagment",
-            new MySqlServerVersion(new Version(8, 0, 11))));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection") ??
+        "server=127.0.0.1;port=3306;database=StudentManagment;uid=root;pwd=;charset=utf8;Convert Zero Datetime=True",
+        new MySqlServerVersion(new Version(8, 0, 0))
+    ));
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -24,8 +26,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -35,6 +37,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using API_UP2.Models;
 using System;
+using Newtonsoft.Json.Linq;
 
 namespace API_UP2.Context
 {
@@ -28,10 +29,29 @@ namespace API_UP2.Context
         public DbSet<TypeOfDisability> TypeOfDisability { get; set; }
         public DbSet<User> Users { get; set; }
 
-       
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // **Вот исправленная конфигурация для AuditLog:**
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TableName).HasMaxLength(100);
+                entity.Property(e => e.Action).HasMaxLength(50);
+                entity.Property(e => e.RecordId).IsRequired();
+                entity.Property(e => e.ChangedBy).IsRequired();
+                entity.Property(e => e.ChangedAt).IsRequired();
+
+                // Игнорируем свойства JObject, чтобы EF не пытался их маппить
+                entity.Ignore(e => e.OldData);
+                entity.Ignore(e => e.NewData);
+
+               
+            });
+
+            // Остальные конфигурации остаются без изменений
             modelBuilder.Entity<Student>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -44,11 +64,13 @@ namespace API_UP2.Context
                 entity.Property(e => e.Financy).HasMaxLength(50);
                 entity.Property(e => e.DepartmentId).HasMaxLength(50);
             });
+
             modelBuilder.Entity<Departments>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -56,6 +78,7 @@ namespace API_UP2.Context
                 entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.RoleId).HasMaxLength(50);
             });
+
             modelBuilder.Entity<Orphans>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -63,6 +86,7 @@ namespace API_UP2.Context
                 entity.Property(e => e.Note).HasColumnType("text");
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<StudentDisabledPeople>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -70,6 +94,7 @@ namespace API_UP2.Context
                 entity.Property(e => e.Note).HasColumnType("text");
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<StudentOVZ>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -77,12 +102,14 @@ namespace API_UP2.Context
                 entity.Property(e => e.Note).HasColumnType("text");
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<StudentSVO>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StatusAssignmentOrder).HasMaxLength(100);
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<StudentSOP>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -93,6 +120,7 @@ namespace API_UP2.Context
                 entity.Property(e => e.Note).HasColumnType("text");
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<StudentSPPP>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -104,50 +132,50 @@ namespace API_UP2.Context
                 entity.Property(e => e.Note).HasColumnType("text");
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<SocialPayout>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StatusAssignmentOrder).HasMaxLength(100);
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<StudentHostel>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Note).HasColumnType("text");
                 entity.Property(e => e.FilePath).HasMaxLength(500);
             });
+
             modelBuilder.Entity<RoomsHostel>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.NameRoom).HasMaxLength(100);
             });
+
             modelBuilder.Entity<EducationStudent>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.NameEducationStudent).HasMaxLength(100);
             });
+
             modelBuilder.Entity<Financy>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.NameFinancy).HasMaxLength(100);
             });
+
             modelBuilder.Entity<Gender>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.NameGender).HasMaxLength(50);
             });
+
             modelBuilder.Entity<TypeOfDisability>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.NameType).HasMaxLength(100);
             });
-            modelBuilder.Entity<AuditLog>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.TableName).HasMaxLength(100);
-                entity.Property(e => e.Action).HasMaxLength(50);
-            });
-
         }
     }
 }
