@@ -33,7 +33,7 @@ namespace API_UP2.Controllers
         public async Task<ActionResult<IEnumerable<Student>>> GetDepartmentStudents(int id)
         {
             var students = await _context.Students
-                .Where(s => s.DepartmentId == id.ToString())
+        .Where(s => s.DepartmentId == id)
                 .Include(s => s.Department)
                 .ToListAsync();
 

@@ -27,9 +27,9 @@ namespace API_UP2.Services
                     s.Name.Contains(filter.Search));
             }
 
-            if (!string.IsNullOrEmpty(filter.DepartmentId))
+            if (int.TryParse(filter.DepartmentId, out int departmentId))
             {
-                query = query.Where(s => s.DepartmentId == filter.DepartmentId);
+                query = query.Where(s => s.DepartmentId == departmentId);
             }
 
             if (!string.IsNullOrEmpty(filter.GroupName))

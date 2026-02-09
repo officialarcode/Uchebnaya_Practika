@@ -48,7 +48,7 @@ namespace API_UP2.Context
                 entity.Ignore(e => e.OldData);
                 entity.Ignore(e => e.NewData);
 
-               
+
             });
 
             // Остальные конфигурации остаются без изменений
@@ -67,12 +67,14 @@ namespace API_UP2.Context
 
             modelBuilder.Entity<Departments>(entity =>
             {
+                entity.ToTable("departament");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             });
 
             modelBuilder.Entity<User>(entity =>
             {
+                entity.ToTable("users");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(100);

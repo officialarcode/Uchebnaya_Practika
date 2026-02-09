@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API_UP2.Models;
+using API_UP2.DTOs;
+using API_UP2.Context;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using API_UP2.Context;
+using BCrypt.Net;
 
 namespace API_UP2.Controllers
 {
@@ -24,63 +26,185 @@ namespace API_UP2.Controllers
         /// Получить всех пользователей
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users.ToListAsync();
+            return users.Select(u => new UserResponseDto
+            {
+                Id = u.Id,
+                Name = u.Name,
+                Lastname = u.Lastname,
+                Surname = u.Surname,
+                Username = u.Username,
+                RoleId = u.RoleId
+            }).ToList();
         }
 
         /// <summary>
         /// Получить пользователя по ID
         /// </summary>
-        /// <param name="id">ID пользователя</param>
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserResponseDto>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound(new { message = $"Пользователь с ID {id} не найден" });
             }
-            return user;
+
+            return new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Lastname = user.Lastname,
+                Surname = user.Surname,
+                Username = user.Username,
+                RoleId = u.RoleId
+            };
         }
 
         /// <summary>
-        /// Создать нового пользователя
+        /// Зарегистрировать нового пользователя
         /// </summary>
-        /// <param name="user">Данные пользователя</param>
-        [HttpPost]
-        public async Task<ActionResult<User>> CreateUser([FromBody] User user)
+        [HttpPost("register")]
+        public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterUserDto registerDto)
         {
+            if (registerDto == null)
+                return BadRequest(new { message = "Данные пользователя не могут быть пустыми" });
+
+            // Проверяем уникальность имени пользователя
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == registerDto.Username);
+
+            if (existingUser != null)
+                return Conflict(new { message = "Пользователь с таким именем уже существует" });
+
+            // Проверяем, существует ли роль
+            try
+            {
+                var roleExists = await _context.Database
+                    .ExecuteSqlRawAsync("SELECT COUNT(*) FROM role WHERE ID_Role = {0}", registerDto.RoleId) > 0;
+
+                if (!roleExists)
+                {
+                    return BadRequest(new { message = $"Роль с ID {registerDto.RoleId} не существует" });
+                }
+            }
+            catch
+            {
+                // Если таблица role не существует, пропускаем проверку
+            }
+
+            // Хешируем пароль
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+            // Создаем пользователя
+            var user = new User
+            {
+                Name = registerDto.Name,
+                Lastname = registerDto.Lastname,
+                Surname = registerDto.Surname,
+                Username = registerDto.Username,
+                PasswordHash = passwordHash,
+                RoleId = registerDto.RoleId
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+
+            var response = new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Lastname = user.Lastname,
+                Surname = user.Surname,
+                Username = user.Username,
+                RoleId = user.RoleId
+            };
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, response);
         }
 
         /// <summary>
         /// Аутентификация пользователя
         /// </summary>
-        /// <param name="loginData">Логин и пароль</param>
         [HttpPost("login")]
-        public ActionResult Login([FromBody] LoginRequest loginData)
+        public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var user = _context.Users
-                .FirstOrDefault(u => u.Username == loginData.Username && u.PasswordHash == loginData.Password);
+            if (loginDto == null)
+                return BadRequest(new { message = "Данные для входа не могут быть пустыми" });
+
+            // Находим пользователя по имени
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == loginDto.Username);
 
             if (user == null)
                 return Unauthorized(new { message = "Неверный логин или пароль" });
 
+            // Проверяем пароль с использованием BCrypt
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+
+            if (!isPasswordValid)
+                return Unauthorized(new { message = "Неверный логин или пароль" });
+
+            // Успешная аутентификация
             return Ok(new
             {
                 userId = user.Id,
                 username = user.Username,
-                role = user.RoleId
+                name = user.Name,
+                lastname = user.Lastname,
+                surname = user.Surname,
+                role = user.RoleId,
+                message = "Успешный вход"
             });
         }
-    }
 
-    public class LoginRequest
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        /// <summary>
+        /// Создать пользователя (старый метод для совместимости)
+        /// </summary>
+        [HttpPost]
+        [Obsolete("Используйте метод /api/users/register вместо этого")]
+        public async Task<ActionResult<User>> CreateUser([FromBody] User user)
+        {
+            if (user == null)
+                return BadRequest(new { message = "Данные пользователя не могут быть пустыми" });
+
+            // Проверяем, есть ли пароль для хеширования
+            if (string.IsNullOrEmpty(user.PasswordHash))
+            {
+                return BadRequest(new { message = "Пароль не может быть пустым" });
+            }
+
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == user.Username);
+
+            if (existingUser != null)
+                return Conflict(new { message = "Пользователь с таким именем уже существует" });
+
+            // Проверяем, существует ли роль
+            try
+            {
+                var roleExists = await _context.Database
+                    .ExecuteSqlRawAsync("SELECT COUNT(*) FROM role WHERE ID_Role = {0}", user.RoleId) > 0;
+
+                if (!roleExists)
+                {
+                    return BadRequest(new { message = $"Роль с ID {user.RoleId} не существует" });
+                }
+            }
+            catch
+            {
+                // Если таблица role не существует, пропускаем проверку
+            }
+
+            // Хешируем пароль перед сохранением
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        }
     }
 }
