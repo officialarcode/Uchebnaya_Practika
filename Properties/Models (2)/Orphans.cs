@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace API_UP2.Models
 {
-    [Table("student_hostel")]
-    public class StudentHostel
+    [Table("orphans")]
+    public class Orphans
     {
         [Key]
         [Column("ID")]
@@ -12,22 +13,21 @@ namespace API_UP2.Models
         [Column("Student_ID")]
         public int StudentId { get; set; }
 
-        [Column("Student_ID")]
-        public Student Student { get; set; }
+        [Column("Status_Assignment_Order")]
+        public string StatusAssignmentOrder { get; set; }
 
-        [Column("Room")]
-        public int Room { get; set; }
+        [Column("Start_Status")]
+        public DateTime StartStatus { get; set; }
 
-        [Column("Check_In_Date")]
-        public DateTime CheckInDate { get; set; }
-
-        [Column("Eviction_Date")]
-        public DateTime EvictionDate { get; set; }
+        [Column("End_Status")]
+        public DateTime EndStatus { get; set; }
 
         [Column("Note")]
         public string Note { get; set; }
 
         [Column("FilePath")]
         public string FilePath { get; set; }
+        [ForeignKey("StudentId")]
+        public Student Student { get; set; }
     }
 }
