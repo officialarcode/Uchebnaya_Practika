@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API_UP2.Models
 {
-    [Table("student")]
+    [Table("social_payout")]
     public class SocialPayout
     {
         [Key]

@@ -59,7 +59,7 @@ namespace API_UP2.Controllers
                 Lastname = user.Lastname,
                 Surname = user.Surname,
                 Username = user.Username,
-                RoleId = u.RoleId
+                RoleId = user.RoleId
             };
         }
 
@@ -79,23 +79,16 @@ namespace API_UP2.Controllers
             if (existingUser != null)
                 return Conflict(new { message = "Пользователь с таким именем уже существует" });
 
-            // Проверяем, существует ли роль
-            try
+            // Проверяем уникальность email (если он есть)
+            if (!string.IsNullOrEmpty(registerDto.Email))
             {
-                var roleExists = await _context.Database
-                    .ExecuteSqlRawAsync("SELECT COUNT(*) FROM role WHERE ID_Role = {0}", registerDto.RoleId) > 0;
-
-                if (!roleExists)
-                {
-                    return BadRequest(new { message = $"Роль с ID {registerDto.RoleId} не существует" });
-                }
-            }
-            catch
-            {
-                // Если таблица role не существует, пропускаем проверку
+                var existingEmail = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == registerDto.Email);
+                if (existingEmail != null)
+                    return Conflict(new { message = "Пользователь с таким Email уже существует" });
             }
 
-            // Хешируем пароль
+            // Хешируем пароль с помощью BCrypt
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
             // Создаем пользователя
@@ -105,8 +98,9 @@ namespace API_UP2.Controllers
                 Lastname = registerDto.Lastname,
                 Surname = registerDto.Surname,
                 Username = registerDto.Username,
+                Email = registerDto.Email, // Добавьте Email в RegisterUserDto
                 PasswordHash = passwordHash,
-                RoleId = registerDto.RoleId
+                RoleId = registerDto.RoleId ?? 2 // Если RoleId не указан, ставим 2 (обычный пользователь)
             };
 
             _context.Users.Add(user);

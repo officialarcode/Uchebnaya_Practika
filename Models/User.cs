@@ -23,4 +23,14 @@ public class User
 
     [Column("Password_Hash")]
     public string PasswordHash { get; set; }
+
+    [Column("RoleId")] // Добавьте атрибут, если в БД поле называется так же
+    public int RoleId { get; set; }
+
+    // ДОБАВЬТЕ ЭТИ ПОЛЯ для работы PasswordResetService
+    [Column("Email")]
+    public string? Email { get; set; }
+
+    [Column("ResetPasswordToken")]
+    public string? ResetPasswordToken { get; set; }
 }

@@ -21,7 +21,10 @@ namespace API_UP2.DTOs
         [MinLength(6)]
         public string Password { get; set; }
 
-        public int? RoleId { get; set; } // Сделали nullable
+        [EmailAddress]
+        public string? Email { get; set; } 
+
+        public int? RoleId { get; set; }
     }
 
     public class LoginDto
@@ -41,5 +44,18 @@ namespace API_UP2.DTOs
         public string Surname { get; set; }
         public string Username { get; set; }
         public int RoleId { get; set; }
+    }
+
+    public class ForgotPasswordDto
+    {
+        public string Email { get; set; }
+    }
+
+    public class ResetPasswordDto
+    {
+        public string Email { get; set; }
+        public string Code { get; set; }
+        public string NewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
     }
 }
