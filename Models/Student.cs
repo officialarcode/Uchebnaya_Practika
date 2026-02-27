@@ -27,9 +27,11 @@ public class Student
     public string Phone { get; set; }
 
     [Column("Education")]
-    public string Education { get; set; }
+    public int Education { get; set; } 
+
     [Column("Departament")]
     public int DepartmentId { get; set; }
+
     [ForeignKey("DepartmentId")]
     public Departments Department { get; set; }
 
@@ -37,7 +39,7 @@ public class Student
     public string Education_Group { get; set; }
 
     [Column("Financy")]
-    public string Financy { get; set; }
+    public int Financy { get; set; }
 
     [Column("Year_Entrance")]
     public int Year_Entrance { get; set; }

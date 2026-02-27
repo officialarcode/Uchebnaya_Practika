@@ -4,35 +4,34 @@ namespace API_UP2.DTOs
 {
     public class RegisterUserDto
     {
-        [Required]
+        [Required(ErrorMessage = "Имя обязательно")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Фамилия обязательна")]
         public string Lastname { get; set; }
 
-        [Required]
         public string Surname { get; set; }
 
-        [Required]
-        [MinLength(3)]
+        [Required(ErrorMessage = "Логин обязателен")]
         public string Username { get; set; }
 
-        [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
+        [Required(ErrorMessage = "Email обязателен")]
+        [EmailAddress(ErrorMessage = "Некорректный Email")]
+        public string Email { get; set; }
 
-        [EmailAddress]
-        public string? Email { get; set; } 
+        [Required(ErrorMessage = "Пароль обязателен")]
+        [MinLength(6, ErrorMessage = "Пароль должен быть не менее 6 символов")]
+        public string Password { get; set; }
 
         public int? RoleId { get; set; }
     }
 
     public class LoginDto
     {
-        [Required]
+        [Required(ErrorMessage = "Логин обязателен")]
         public string Username { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Пароль обязателен")]
         public string Password { get; set; }
     }
 
@@ -43,19 +42,20 @@ namespace API_UP2.DTOs
         public string Lastname { get; set; }
         public string Surname { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
         public int RoleId { get; set; }
     }
 
-    public class ForgotPasswordDto
+    public class LoginResponseDto
     {
+        public int UserId { get; set; }
+        public string Username { get; set; }
+        public string Name { get; set; }
+        public string Lastname { get; set; }
+        public string Surname { get; set; }
         public string Email { get; set; }
-    }
-
-    public class ResetPasswordDto
-    {
-        public string Email { get; set; }
-        public string Code { get; set; }
-        public string NewPassword { get; set; }
-        public string ConfirmPassword { get; set; }
+        public int RoleId { get; set; }
+        public string Token { get; set; }
+        public string Message { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using API_UP2.DTOs;
 using API_UP2.Context;
+using API_UP2.Models;
 
 namespace API_UP2.Services
 {
@@ -23,23 +24,17 @@ namespace API_UP2.Services
             {
                 query = query.Where(s =>
                     s.LastName.Contains(filter.Search) ||
-                    s.FirstName.Contains(filter.Search) ||
-                    s.Name.Contains(filter.Search));
+                    s.FirstName.Contains(filter.Search));
             }
 
-            if (int.TryParse(filter.DepartmentId, out int departmentId))
+            if (filter.DepartmentId.HasValue)
             {
-                query = query.Where(s => s.DepartmentId == departmentId);
+                query = query.Where(s => s.DepartmentId == filter.DepartmentId.Value);
             }
 
             if (!string.IsNullOrEmpty(filter.GroupName))
             {
                 query = query.Where(s => s.Education_Group == filter.GroupName);
-            }
-
-            if (!string.IsNullOrEmpty(filter.Funding))
-            {
-                query = query.Where(s => s.Financy == filter.Funding);
             }
 
             if (filter.IsExpelled.HasValue)
@@ -153,7 +148,6 @@ namespace API_UP2.Services
                 ["student"] = student
             };
 
-            // Получаем все статусы студента
             var orphanStatuses = await _context.Orphans
                 .Where(o => o.StudentId == studentId)
                 .ToListAsync();
@@ -219,7 +213,6 @@ namespace API_UP2.Services
             {
                 bool hasActiveStatus = false;
 
-                // Проверяем каждый статус
                 hasActiveStatus |= await _context.Orphans
                     .AnyAsync(o => o.StudentId == student.Id &&
                                  o.StartStatus <= checkDate &&

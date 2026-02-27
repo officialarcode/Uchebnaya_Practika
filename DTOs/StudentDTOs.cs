@@ -11,7 +11,7 @@ namespace API_UP2.DTOs
         public DateTime BirthDate { get; set; }
         public string Gender { get; set; }
         public string Phone { get; set; }
-        public string Education { get; set; }
+        public int Education { get; set; } // Изменено с string на int
         public string DepartmentName { get; set; }
         public string GroupName { get; set; }
         public string Funding { get; set; }
@@ -27,8 +27,8 @@ namespace API_UP2.DTOs
         public DateTime BirthDate { get; set; }
         public string Gender { get; set; }
         public string Phone { get; set; }
-        public string Education { get; set; }
-        public string DepartmentId { get; set; }
+        public int Education { get; set; } // Изменено с string на int
+        public int DepartmentId { get; set; } // Изменено с string на int
         public string GroupName { get; set; }
         public string Funding { get; set; }
         public int AdmissionYear { get; set; }
@@ -37,7 +37,7 @@ namespace API_UP2.DTOs
     public class FilterDTO
     {
         public string? Search { get; set; }
-        public string? DepartmentId { get; set; }
+        public int? DepartmentId { get; set; } // Изменено с string на int
         public string? GroupName { get; set; }
         public string? Funding { get; set; }
         public bool? IsExpelled { get; set; }

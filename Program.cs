@@ -1,4 +1,5 @@
 using API_UP2.Context;
+using API_UP2.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -13,7 +14,7 @@ builder.Services.AddDbContext<StudentManagementContext>(options =>
         new MySqlServerVersion(new Version(8, 0, 0))
     ));
 
-
+builder.Services.AddScoped<StudentService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

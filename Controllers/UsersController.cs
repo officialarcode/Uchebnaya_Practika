@@ -80,13 +80,13 @@ namespace API_UP2.Controllers
                 return Conflict(new { message = "Пользователь с таким именем уже существует" });
 
             // Проверяем уникальность email (если он есть)
-            if (!string.IsNullOrEmpty(registerDto.Email))
-            {
-                var existingEmail = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == registerDto.Email);
-                if (existingEmail != null)
-                    return Conflict(new { message = "Пользователь с таким Email уже существует" });
-            }
+            //if (!string.IsNullOrEmpty(registerDto.Email))
+            //{
+            //    var existingEmail = await _context.Users
+            //        .FirstOrDefaultAsync(u => u.Email == registerDto.Email);
+            //    if (existingEmail != null)
+            //        return Conflict(new { message = "Пользователь с таким Email уже существует" });
+            //}
 
             // Хешируем пароль с помощью BCrypt
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
@@ -98,7 +98,7 @@ namespace API_UP2.Controllers
                 Lastname = registerDto.Lastname,
                 Surname = registerDto.Surname,
                 Username = registerDto.Username,
-                Email = registerDto.Email, // Добавьте Email в RegisterUserDto
+                //Email = registerDto.Email, // Добавьте Email в RegisterUserDto
                 PasswordHash = passwordHash,
                 RoleId = registerDto.RoleId ?? 2 // Если RoleId не указан, ставим 2 (обычный пользователь)
             };

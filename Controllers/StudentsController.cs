@@ -214,26 +214,6 @@ namespace API_UP2.Controllers
         /// <summary>
         /// Поиск студентов с фильтрами
         /// </summary>
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchStudents(
-            [FromQuery] string search = null,
-            [FromQuery] string departmentId = null,
-            [FromQuery] string groupName = null,
-            [FromQuery] string funding = null,
-            [FromQuery] bool? isExpelled = null)
-        {
-            var filter = new FilterDTO
-            {
-                Search = search,
-                DepartmentId = departmentId,
-                GroupName = groupName,
-                Funding = funding,
-                IsExpelled = isExpelled
-            };
-
-            var students = await _studentService.GetFilteredStudentsAsync(filter);
-            return Ok(students);
-        }
 
         private async Task<bool> StudentExists(int id)
         {
