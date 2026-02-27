@@ -2,6 +2,7 @@
 using API_UP2.DTOs;
 using API_UP2.Context;
 using API_UP2.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace API_UP2.Services
 {
@@ -30,6 +31,10 @@ namespace API_UP2.Services
             if (filter.DepartmentId.HasValue)
             {
                 query = query.Where(s => s.DepartmentId == filter.DepartmentId.Value);
+            }
+            if (!string.IsNullOrEmpty(filter.StatusType))
+            {
+                query = query.Where(s => s.Information_Deduction == filter.StatusType);
             }
 
             if (!string.IsNullOrEmpty(filter.GroupName))
